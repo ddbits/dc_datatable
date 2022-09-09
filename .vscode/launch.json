@@ -1,0 +1,14 @@
+{
+
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "flutter_dc_datable_widget",
+            "request": "launch",
+            "type": "dart",
+            "args": ["-d", "chrome"]
+        },
+        
+    ]
+
+}
