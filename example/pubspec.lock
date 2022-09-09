@@ -43,7 +43,7 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
-  dc_datatable:
+  dc_datatable_paginator:
     dependency: "direct main"
     description:
       path: ".."

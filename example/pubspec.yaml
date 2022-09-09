@@ -12,7 +12,7 @@ environment:
 
 
 dependencies:
-  dc_datatable:
+  dc_datatable_paginator:
     path: ../
   flutter:
     sdk: flutter

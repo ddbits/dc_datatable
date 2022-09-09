@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:dc_datatable/dc_datatable.dart';
+import 'package:dc_datatable_paginator/dc_datatable.dart';
 
 import 'dc_datatable_paged.dart';
 import 'dc_datatable_paginator.dart';

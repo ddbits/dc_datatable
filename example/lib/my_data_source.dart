@@ -1,4 +1,4 @@
-import 'package:dc_datatable/dc_datatable.dart';
+import 'package:dc_datatable_paginator/dc_datatable.dart';
 import 'package:flutter/material.dart';
 import 'model_example.dart';
 

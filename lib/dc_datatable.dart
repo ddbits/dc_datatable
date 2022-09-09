@@ -1,4 +1,4 @@
-library dc_datatable;
+library dc_datatable_paginator;
 
 export 'src/dc_datatable.dart';
 export 'src/dc_datatable_source.dart';
