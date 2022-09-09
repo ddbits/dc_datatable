@@ -7,12 +7,12 @@
 
 2. Import:
 ```dart
-import 'package:dc_datatable/dc_datatable.dart';
+import 'package:dc_datatable_paginator/dc_datatable_paginator.dart';
 ```
 
 3. Create DcDataTableSource:
 ```dart
-import 'package:dc_datatable/dc_datatable.dart';
+import 'package:dc_datatable_paginator/dc_datatable_paginator.dart';
 import 'package:flutter/material.dart';
 import 'model_example.dart';
 

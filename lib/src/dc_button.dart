@@ -1,7 +1,7 @@
 //Botao
 import 'package:flutter/material.dart';
 
-class DcDatableButton extends StatelessWidget {
+class DcButton extends StatelessWidget {
   /// Callback for button press.
   final VoidCallback? onPressed;
 
@@ -11,8 +11,8 @@ class DcDatableButton extends StatelessWidget {
   /// Whether the button is currently selected.
   final bool selected;
 
-  /// Creates an instance of [DcDatableButton].
-  const DcDatableButton({
+  /// Creates an instance of [DcButton].
+  const DcButton({
     Key? key,
     required this.onPressed,
     required this.child,
@@ -39,6 +39,4 @@ class DcDatableButton extends StatelessWidget {
 
   Color? _backgroundColor(BuildContext context, bool selected) =>
       selected ? Theme.of(context).colorScheme.primary : Colors.grey[300];
-
-  
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'dc_datatable_paged.dart';
+import 'dc_paged.dart';
 
-abstract class DcDataTableSource<T> extends ChangeNotifier {
+abstract class DcSource<T> extends ChangeNotifier {
   //
   List<DataColumn> _columns = const [DataColumn(label: Text('None'))];
 
@@ -15,7 +15,6 @@ abstract class DcDataTableSource<T> extends ChangeNotifier {
   List _data = [];
   List get data => _data;
 
-
   List _dataSelected = [];
   List get dataSelected => _dataSelected;
   set dataSelected(List value) {
@@ -23,10 +22,10 @@ abstract class DcDataTableSource<T> extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<DcDataTablePaged> onLoadData();
+  Future<DcPaged> onLoadData();
 
   load() async {
-    DcDataTablePaged paged = await onLoadData();
+    DcPaged paged = await onLoadData();
     _totalRecords = paged.totalRecords;
     _data = paged.data;
     notifyListeners();
@@ -52,8 +51,6 @@ abstract class DcDataTableSource<T> extends ChangeNotifier {
 
     return createRows;
   }
-
-  
 
   bool _sortAscending = false;
   bool get sortAscending => _sortAscending;

@@ -1,4 +1,4 @@
-import 'package:dc_datatable_paginator/dc_datatable.dart';
+import 'package:dc_datatable_paginator/dc_datatable_paginator.dart';
 import 'package:flutter/material.dart';
 
 import 'model_example.dart';
@@ -25,7 +25,7 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            DcDataTable(
+            DcDataTablePaginator(
               labelPage: 'Page',
               labelRecords: 'Records',
               source: source,
