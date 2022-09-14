@@ -10,38 +10,66 @@
 import 'package:dc_datatable_paginator/dc_datatable_paginator.dart';
 ```
 
-3. Create DcDataTableSource:
+3. Create Model:
 ```dart
-import 'package:dc_datatable_paginator/dc_datatable_paginator.dart';
-import 'package:flutter/material.dart';
-import 'model_example.dart';
+class ModelExample {
+  final int id;
+  final String name;
+  final String description;
+  ModelExample({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
 
-class MyDataSource extends DcDataTableSource {
   @override
-  List<DataColumn> get columns {
-    return const [
-      DataColumn(label: Text('Id')),
-      DataColumn(label: Text('Name')),
-      DataColumn(label: Text('Description')),
-    ];
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is ModelExample &&
+        other.id == id &&
+        other.name == name &&
+        other.description == description;
   }
 
   @override
-  Future<DcDataTablePaged> onLoadData() async {
-    List<ModelExample> dados = List.generate(10, (i) {
-      i++;
-      return ModelExample(
-          id: i,
-          name: "Name $i",
-          description: "Description:  Record:$i   Page: $currentPage");
-    });
+  int get hashCode => id.hashCode ^ name.hashCode ^ description.hashCode;
+}
+```
 
-    return DcDataTablePaged(data: dados, totalRecords: 110);
+
+4. Create DcDataTableController:
+```dart
+class MyDataTableController extends DcDataTableController {
+  MyDataTableController(super.context);
+
+  @override
+  void onLoadData() async {
+    //get Data from API
+    debugPrint("fetch data from  api...");
+    Future.delayed(
+      const Duration(seconds: 0),
+      () {
+        debugPrint(" data return now");
+        List<ModelExample> dataList = List.generate(10, (i) {
+          i++;
+          return ModelExample(
+              id: i + (currentPage * 10),
+              name: "Name ${i + (currentPage * 10)} ",
+              description:
+                  "Description:  Record:${i + (currentPage * 10)}  Page: ${currentPage + 1}");
+        });
+
+        data = dataList;
+        //symbolic value
+        totalRecords = 110;
+      },
+    );
   }
 
   @override
-  DataRow getRow(int i, List data, List dataSelected) {
-    ModelExample model = data[i];
+  DataRow getRow(int rowIndex) {
+    ModelExample model = data[rowIndex];
     return DataRow(
         cells: <DataCell>[
           DataCell(Text(model.id.toString())),
@@ -55,38 +83,90 @@ class MyDataSource extends DcDataTableSource {
           } else {
             dataSelected.add(model);
           }
-          debugPrint("Row Selected $i");
+          onLoadData();
         });
   }
 }
-```
-
-
-4. Add DcDataTableSource in Providers:
-```dart
-
-void main() {
-  runApp(ChangeNotifierProvider(
-    create: (_) => MyDataSource(),
-    child: const MyApp(),
-  ));
-}
 
 ```
 
 
-5. Get Provider and use:
+5. Create Screen:
 ```dart
 
+class MyHomePage extends StatelessWidget {
+  final String title;
 
-MyDataSource source = Provider.of<MyDataSource>(context, listen: true);
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
-  DcDataTable(
+  @override
+  Widget build(BuildContext context) {
+    DcDataTableController controller = MyDataTableController(context);
+
+    controller.sortColumnIndex = 1;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ///  Widget Definition
+            DcDataTable(
+              controller: controller,
               labelPage: 'Page',
               labelRecords: 'Records',
-              source: source,
+              labelNoRecords: 'No Records',
+              pageSize: 5,
+              columns: [
+                DataColumn(
+                    label: const Text('Id'),
+                    onSort: (columnIndex, ascending) {
+                      onSortColumn(controller, columnIndex, ascending);
+                    }),
+                DataColumn(
+                    label: const Text('Name'),
+                    onSort: (columnIndex, ascending) {
+                      onSortColumn(controller, columnIndex, ascending);
+                    }),
+                DataColumn(
+                    label: const Text('Description'),
+                    onSort: (columnIndex, ascending) {
+                      onSortColumn(controller, columnIndex, ascending);
+                    }),
+              ],
             ),
+          ],
+        ),
+      ),
+    );
 
+    //record search simulation in an api
+  }
+
+
+    void onSortColumn(
+      DcDataTableController controller, int columnIndex, bool ascending) {
+    List<ModelExample> list = List<ModelExample>.from(controller.data);
+
+    if (columnIndex == 0) {
+      list.sort((m1, m2) => DcDataTableController.compareString(
+          ascending, m1.id.toString(), m2.id.toString()));
+    } else if (columnIndex == 1) {
+      list.sort((m1, m2) =>
+          DcDataTableController.compareString(ascending, m1.name, m2.name));
+    } else if (columnIndex == 2) {
+      list.sort((m1, m2) => DcDataTableController.compareString(
+          ascending, m1.description, m2.description));
+    }
+
+    controller.data = list;
+    controller.sortAscending = ascending;
+    controller.sortColumnIndex = columnIndex;
+  }
+}
 
 
 ```

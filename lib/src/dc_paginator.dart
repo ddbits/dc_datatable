@@ -4,26 +4,22 @@ import '../dc_datatable_paginator.dart';
 class DcPaginator extends StatelessWidget {
   final bool enable;
   final int pageSize;
-  final int initialPage;
-  final int totalRecords;
   final int limitPages;
   final String labelPage;
   final String labelRecords;
-  final DcSource controller;
+  final DcDataTableController controller;
 
   const DcPaginator({
     Key? key,
-    this.pageSize = 10,
-    this.totalRecords = 0,
-    this.limitPages = 10,
+    required this.controller,
+    required this.pageSize,
+    required this.limitPages,
     this.enable = false,
     this.labelPage = 'Page',
     this.labelRecords = 'Records',
-    this.initialPage = 1,
-    required this.controller,
   }) : super(key: key);
 
-  int get maxPageSize => (totalRecords / pageSize).ceil();
+  int get maxPageSize => (controller.totalRecords / pageSize).ceil();
 
   @override
   Widget build(BuildContext context) {
@@ -41,23 +37,22 @@ class DcPaginator extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 DcButton(
-                  onPressed: controller.currentPage != 0 ? _first : null,
+                  onPressed: _getCurrentPage() != 0 ? _first : null,
                   child: const Icon(Icons.first_page),
                 ),
                 DcButton(
-                  onPressed: controller.currentPage > 0 ? _prev : null,
+                  onPressed: _getCurrentPage() > 0 ? _prev : null,
                   child: const Icon(Icons.chevron_left),
                 ),
                 ..._generateButtonList(),
                 DcButton(
                   onPressed:
-                      controller.currentPage + 1 >= maxPageSize ? null : _next,
+                      _getCurrentPage() + 1 >= maxPageSize ? null : _next,
                   child: const Icon(Icons.chevron_right),
                 ),
                 DcButton(
-                  onPressed: (controller.currentPage != maxPageSize - 1)
-                      ? _last
-                      : null,
+                  onPressed:
+                      (_getCurrentPage() != maxPageSize - 1) ? _last : null,
                   child: const Icon(Icons.last_page),
                 ),
               ],
@@ -65,7 +60,7 @@ class DcPaginator extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                  '$labelRecords: $totalRecords   $labelPage: ${controller.currentPage + 1}/$maxPageSize',
+                  '$labelRecords: ${controller.totalRecords}   $labelPage: ${_getCurrentPage() + 1}/$maxPageSize',
                   style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
@@ -74,30 +69,41 @@ class DcPaginator extends StatelessWidget {
     );
   }
 
-  _first() {
-    controller.currentPage = 0;
+  int _getCurrentPage() {
+    return controller.currentPage;
+  }
 
-    // onPageChange?.call(controller.currentPage);
+  _setCurrentPage(int value) {
+    return controller.currentPage = value;
+  }
+
+  _first() {
+    //_getCurrentPage() = 0;
+    _setCurrentPage(0);
+
+    // onPageChange?.call(_getCurrentPage());
   }
 
   _last() {
-    controller.currentPage = maxPageSize - 1;
-    // onPageChange?.call(controller.currentPage);
+    _setCurrentPage(maxPageSize - 1);
+    // onPageChange?.call(_getCurrentPage());
   }
 
   _prev() {
-    controller.currentPage--;
-    // onPageChange?.call(controller.currentPage);
+    _setCurrentPage(_getCurrentPage() - 1);
+    // onPageChange?.call(_getCurrentPage());
   }
 
   _next() {
-    controller.currentPage++;
-    //   onPageChange?.call(controller.currentPage);
+    _setCurrentPage(_getCurrentPage() + 1);
+//    _getCurrentPage()++;
+    //   onPageChange?.call(_getCurrentPage());
   }
 
   _navigateToPage(int index) {
     index = index;
-    controller.currentPage = index;
+    //_getCurrentPage() = index;
+    _setCurrentPage(index);
     //  onPageChange?.call(index);
   }
 
@@ -107,7 +113,7 @@ class DcPaginator extends StatelessWidget {
     int pageSize = limitPages;
     int pageStart = 0;
     int pageEnd = maxPageSize;
-    int currentPage = controller.currentPage + 1;
+    int currentPage = _getCurrentPage() + 1;
 
     if (limitPages < maxPageSize) {
       int group = (currentPage / pageSize).ceil();
@@ -139,5 +145,5 @@ class DcPaginator extends StatelessWidget {
                 color: _selected(index) ? Colors.white : Colors.black87)),
       );
 
-  bool _selected(index) => index == controller.currentPage;
+  bool _selected(index) => index == _getCurrentPage();
 }
