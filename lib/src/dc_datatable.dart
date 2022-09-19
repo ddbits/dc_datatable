@@ -6,28 +6,33 @@ import 'dc_paginator.dart';
 
 class DcDataTable extends StatefulWidget {
   final List<DataColumn> columns;
-  final int pageSize;
-  final int limitPages;
-  final int initialPage;
+
   final bool paginator;
   final String labelPage;
   final String labelRecords;
   final String labelNoRecords;
+  final bool showCheckboxColumn;
+  final bool showInputSearch;
+  final String labelSearch;
+  final String labelLoading;
+  final TextInputAction? textInputActionSearch;
 
   final DcDataTableController controller;
 
-  const DcDataTable({
-    Key? key,
-    required this.controller,
-    required this.columns,
-    this.limitPages = 5,
-    this.pageSize = 10,
-    this.initialPage = 0,
-    this.paginator = true,
-    this.labelPage = 'Página',
-    this.labelRecords = 'Registros',
-    this.labelNoRecords = "Sem registros",
-  }) : super(key: key);
+  const DcDataTable(
+      {Key? key,
+      required this.controller,
+      required this.columns,
+      this.paginator = true,
+      this.labelPage = 'Página',
+      this.labelRecords = 'Registros',
+      this.labelNoRecords = "Sem registros",
+      this.labelSearch = "Pesquisa",
+      this.labelLoading = "Carregando...",
+      this.showCheckboxColumn = false,
+      this.showInputSearch = false,
+      this.textInputActionSearch = TextInputAction.go})
+      : super(key: key);
 
   @override
   State<DcDataTable> createState() => _DcDataTableState();
@@ -39,6 +44,12 @@ class _DcDataTableState extends State<DcDataTable> {
     super.initState();
 
     widget.controller.addListenerUpdateCurrentPage(() {
+      setState(() {
+        fetchData();
+      });
+    });
+
+    widget.controller.addListenerUpdateSearchValue(() {
       setState(() {
         fetchData();
       });
@@ -71,12 +82,53 @@ class _DcDataTableState extends State<DcDataTable> {
         child: SizedBox(
             width: MediaQuery.of(context).size.width,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
+                //input search
+                widget.showInputSearch
+                    ? Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.50,
+                              ),
+                              Expanded(
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.50,
+                                  child: TextField(
+                                    textInputAction:
+                                        widget.textInputActionSearch,
+                                    keyboardType: TextInputType.text,
+                                    onSubmitted: (value) {
+                                      widget.controller.searchValue = value;
+                                    },
+                                    onChanged: (value) {
+                                      if (widget.textInputActionSearch !=
+                                          TextInputAction.go) {
+                                        widget.controller.searchValue = value;
+                                      }
+                                    },
+                                    decoration: InputDecoration(
+                                      prefixIcon: const Icon(Icons.search),
+                                      labelText: widget.labelSearch,
+                                      border: const OutlineInputBorder(),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ]),
+                      )
+                    : const SizedBox(),
+                //datatable
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: DataTable(
-                    showCheckboxColumn: true,
+                    showCheckboxColumn: widget.showCheckboxColumn,
                     headingTextStyle: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -91,21 +143,48 @@ class _DcDataTableState extends State<DcDataTable> {
                     rows: _createRows(),
                   ),
                 ),
-                widget.controller.data.isEmpty
+                //label no records
+                (!widget.controller.loadding && widget.controller.data.isEmpty)
                     ? Padding(
                         padding: const EdgeInsets.all(10.0),
                         child: Text(widget.labelNoRecords,
                             style:
                                 const TextStyle(fontWeight: FontWeight.bold)))
                     : const SizedBox(),
-                widget.controller.data.isEmpty == false
+
+                //paginator
+                (!widget.controller.loadding &&
+                        widget.controller.data.isNotEmpty)
                     ? DcPaginator(
                         enable: widget.paginator,
                         labelPage: widget.labelPage,
                         labelRecords: widget.labelRecords,
-                        pageSize: widget.pageSize,
                         controller: widget.controller,
-                        limitPages: widget.limitPages,
+                      )
+                    : const SizedBox(),
+
+                //progress
+                widget.controller.loadding
+                    ? Center(
+                        child: Dialog(
+                          // The background color
+                          backgroundColor: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // The loading indicator
+                                const CircularProgressIndicator(),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                // Some text
+                                Text(widget.labelLoading)
+                              ],
+                            ),
+                          ),
+                        ),
                       )
                     : const SizedBox(),
               ],
@@ -125,17 +204,7 @@ class _DcDataTableState extends State<DcDataTable> {
     return createRows;
   }
 
-  Future<void> fetchData() async {
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return const Center(
-    //         child: CircularProgressIndicator(),
-    //       );
-    //     });
-
-    setState(() {
-      widget.controller.onLoadData();
-    });
+  fetchData() async {
+    widget.controller.onLoadData();
   }
 }

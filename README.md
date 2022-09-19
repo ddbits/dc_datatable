@@ -40,29 +40,33 @@ class ModelExample {
 
 4. Create DcDataTableController:
 ```dart
+
 class MyDataTableController extends DcDataTableController {
   MyDataTableController(super.context);
 
   @override
-  void onLoadData() async {
+  Future<void> onLoadData() async {
     //get Data from API
     debugPrint("fetch data from  api...");
+    loadding = true;
     Future.delayed(
-      const Duration(seconds: 0),
+      const Duration(seconds: 2),
       () {
-        debugPrint(" data return now");
-        List<ModelExample> dataList = List.generate(10, (i) {
+        List<ModelExample> dataList = List.generate(pageSize, (i) {
           i++;
           return ModelExample(
               id: i + (currentPage * 10),
               name: "Name ${i + (currentPage * 10)} ",
               description:
-                  "Description:  Record:${i + (currentPage * 10)}  Page: ${currentPage + 1}");
+                  "Description:  Record:${i + (currentPage * 10)}  Page: ${currentPage + 1}  search: $searchValue ");
         });
 
+        //set result Data from Api
         data = dataList;
         //symbolic value
         totalRecords = 110;
+        //close dialog loading
+        loadding = false;
       },
     );
   }
@@ -104,6 +108,8 @@ class MyHomePage extends StatelessWidget {
     DcDataTableController controller = MyDataTableController(context);
 
     controller.sortColumnIndex = 1;
+    controller.limitPages = 10;
+    controller.pageSize = 7;
 
     return Scaffold(
       appBar: AppBar(
@@ -119,7 +125,9 @@ class MyHomePage extends StatelessWidget {
               labelPage: 'Page',
               labelRecords: 'Records',
               labelNoRecords: 'No Records',
-              pageSize: 5,
+              showCheckboxColumn: false,
+              showInputSearch: true,
+              textInputActionSearch: TextInputAction.search,
               columns: [
                 DataColumn(
                     label: const Text('Id'),
@@ -146,8 +154,7 @@ class MyHomePage extends StatelessWidget {
     //record search simulation in an api
   }
 
-
-    void onSortColumn(
+  void onSortColumn(
       DcDataTableController controller, int columnIndex, bool ascending) {
     List<ModelExample> list = List<ModelExample>.from(controller.data);
 
@@ -167,6 +174,5 @@ class MyHomePage extends StatelessWidget {
     controller.sortColumnIndex = columnIndex;
   }
 }
-
 
 ```

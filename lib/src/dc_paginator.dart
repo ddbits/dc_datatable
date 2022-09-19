@@ -3,8 +3,6 @@ import '../dc_datatable_paginator.dart';
 
 class DcPaginator extends StatelessWidget {
   final bool enable;
-  final int pageSize;
-  final int limitPages;
   final String labelPage;
   final String labelRecords;
   final DcDataTableController controller;
@@ -12,14 +10,12 @@ class DcPaginator extends StatelessWidget {
   const DcPaginator({
     Key? key,
     required this.controller,
-    required this.pageSize,
-    required this.limitPages,
     this.enable = false,
     this.labelPage = 'Page',
     this.labelRecords = 'Records',
   }) : super(key: key);
 
-  int get maxPageSize => (controller.totalRecords / pageSize).ceil();
+  int get maxPageSize => (controller.totalRecords / controller.pageSize).ceil();
 
   @override
   Widget build(BuildContext context) {
@@ -78,44 +74,35 @@ class DcPaginator extends StatelessWidget {
   }
 
   _first() {
-    //_getCurrentPage() = 0;
     _setCurrentPage(0);
-
-    // onPageChange?.call(_getCurrentPage());
   }
 
   _last() {
     _setCurrentPage(maxPageSize - 1);
-    // onPageChange?.call(_getCurrentPage());
   }
 
   _prev() {
     _setCurrentPage(_getCurrentPage() - 1);
-    // onPageChange?.call(_getCurrentPage());
   }
 
   _next() {
     _setCurrentPage(_getCurrentPage() + 1);
-//    _getCurrentPage()++;
-    //   onPageChange?.call(_getCurrentPage());
   }
 
   _navigateToPage(int index) {
     index = index;
-    //_getCurrentPage() = index;
     _setCurrentPage(index);
-    //  onPageChange?.call(index);
   }
 
   List<Widget> _generateButtonList() {
     List<Widget> buttons = [];
 
-    int pageSize = limitPages;
+    int pageSize = controller.limitPages;
     int pageStart = 0;
     int pageEnd = maxPageSize;
     int currentPage = _getCurrentPage() + 1;
 
-    if (limitPages < maxPageSize) {
+    if (controller.limitPages < maxPageSize) {
       int group = (currentPage / pageSize).ceil();
       if (group == 0) group = 1;
       int limiteFim = (group * pageSize);

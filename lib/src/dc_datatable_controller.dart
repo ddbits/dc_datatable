@@ -3,34 +3,47 @@ import 'package:flutter/material.dart';
 class DcDataTableController {
   late BuildContext context;
 
+  final ValueNotifier<int> _pageSize = ValueNotifier(10);
+  final ValueNotifier<int> _initialPage = ValueNotifier(0);
+  final ValueNotifier<int> _limitPages = ValueNotifier(5);
   final ValueNotifier<int> _totalRecords = ValueNotifier(0);
-  int get totalRecords => _totalRecords.value;
-  set totalRecords(int value) => _totalRecords.value = value;
-
   final ValueNotifier<List> _data = ValueNotifier([]);
-  List get data => _data.value;
-  set data(List value) => _data.value = value;
-
   final ValueNotifier<List> _dataSelected = ValueNotifier([]);
-  List get dataSelected => _dataSelected.value;
-  set dataSelected(List value) => _dataSelected.value = value;
-
   final ValueNotifier<int> _currentPage = ValueNotifier(0);
-  int get currentPage => _currentPage.value;
-  set currentPage(int value) => _currentPage.value = value;
-
   final ValueNotifier<bool> _sortAscending = ValueNotifier(false);
-  get sortAscending => _sortAscending.value;
-  set sortAscending(value) => _sortAscending.value = value;
-
   final ValueNotifier<int> _sortColumnIndex = ValueNotifier(0);
-  get sortColumnIndex => _sortColumnIndex.value;
+  final ValueNotifier<String> _searchValue = ValueNotifier('');
+
+  final ValueNotifier<bool> _loadding = ValueNotifier(false);
+
+  //getters
+  int get totalRecords => _totalRecords.value;
+  List get data => _data.value;
+  List get dataSelected => _dataSelected.value;
+  int get currentPage => _currentPage.value;
+  bool get sortAscending => _sortAscending.value;
+  int get sortColumnIndex => _sortColumnIndex.value;
+  int get pageSize => _pageSize.value;
+  int get initialPage => _initialPage.value;
+  int get limitPages => _limitPages.value;
+  String get searchValue => _searchValue.value;
+  bool get loadding => _loadding.value;
+
+  //setters
+  set totalRecords(int value) => _totalRecords.value = value;
+  set data(List value) => _data.value = value;
+  set dataSelected(List value) => _dataSelected.value = value;
+  set currentPage(int value) => _currentPage.value = value;
+  set sortAscending(value) => _sortAscending.value = value;
   set sortColumnIndex(sortColumnIndex) =>
       _sortColumnIndex.value = sortColumnIndex;
+  set pageSize(int value) => _pageSize.value = value;
+  set limitPages(int value) => _limitPages.value = value;
+  set searchValue(String value) => _searchValue.value = value;
 
-  int pageSize = 0;
-  int initialPage = 0;
-  bool paginator = true;
+  set loadding(bool value) {
+    _loadding.value = value;
+  }
 
   DcDataTableController(this.context);
 
@@ -38,7 +51,7 @@ class DcDataTableController {
     return const DataRow(cells: <DataCell>[DataCell(Text("none"))]);
   }
 
-  void onLoadData() async {
+  Future<void> onLoadData() async {
     data = [];
     totalRecords = 0;
   }
@@ -65,6 +78,10 @@ class DcDataTableController {
 
   void addListenerUpdateSortAscending(Function() f) {
     _sortAscending.addListener(f);
+  }
+
+  void addListenerUpdateSearchValue(Function() f) {
+    _searchValue.addListener(f);
   }
 
   static int compareString(bool ascending, String value1, String value2) =>

@@ -24,7 +24,7 @@ class DcButton extends StatelessWidget {
     return Flexible(
       fit: FlexFit.loose,
       child: Padding(
-        padding: const EdgeInsets.all(2.0),
+        padding: const EdgeInsets.all(1.0),
         child: TextButton(
           onPressed: onPressed,
           style: TextButton.styleFrom(
